@@ -1,0 +1,91 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                                 Gold Mini Breakout MT5 |
+//|                                     Expert Advisor by Forex Robot Easy Team |
+//|                                                                      forexroboteasy.com |
+//+------------------------------------------------------------------+
+#property copyright 'Forex Robot Easy Team'
+#property link      'forexroboteasy.com'
+
+// Input parameters
+input int MA_Period = 14; // Moving Average period
+input double Range_Level = 0.001; // Range level for breakout
+input double ATR_Multiplier = 2.0; // Multiplier for ATR
+
+// Global variables
+double maValue; // Moving Average value
+double atrValue; // ATR value
+double upperLevel; // Upper level for breakout
+double lowerLevel; // Lower level for breakout
+
+// Initialization function
+int OnInit()
+{
+   // Calculate initial Moving Average value
+   maValue = iMA(NULL, 0, MA_Period, 0, MODE_SMA, PRICE_CLOSE, 0);
+
+   // Calculate initial ATR value
+   atrValue = iATR(NULL, 0, MA_Period, 0);
+
+   // Calculate initial breakout levels
+   upperLevel = maValue + Range_Level * atrValue;
+   lowerLevel = maValue - Range_Level * atrValue;
+
+   // Print initial values
+   Print('Moving Average Period: ', MA_Period);
+   Print('Range Level: ', Range_Level);
+   Print('ATR Multiplier: ', ATR_Multiplier);
+   Print('Initial Moving Average: ', maValue);
+   Print('Initial ATR: ', atrValue);
+   Print('Initial Upper Level: ', upperLevel);
+   Print('Initial Lower Level: ', lowerLevel);
+
+   return(INIT_SUCCEEDED);
+}
+
+// Deinitialization function
+void OnDeinit(const int reason)
+{
+   // Perform any necessary cleanup tasks here
+}
+
+// Execution function
+void OnTick()
+{
+   // Check for updates in Moving Average
+   double currentMA = iMA(NULL, 0, MA_Period, 0, MODE_SMA, PRICE_CLOSE, 0);
+   if(currentMA != maValue)
+   {
+      maValue = currentMA;
+      upperLevel = maValue + Range_Level * atrValue;
+      lowerLevel = maValue - Range_Level * atrValue;
+      Print('Moving Average Updated: ', maValue);
+      Print('Upper Level Updated: ', upperLevel);
+      Print('Lower Level Updated: ', lowerLevel);
+   }
+
+   // Check for potential breakout
+   double currentHigh = High[0];
+   double currentLow = Low[0];
+   if(currentHigh > upperLevel)
+   {
+      // Enter long position
+      Print('Potential Buy Signal: ', currentHigh);
+      // Add your code for entering a long trade here
+   }
+   else if(currentLow < lowerLevel)
+   {
+      // Enter short position
+      Print('Potential Sell Signal: ', currentLow);
+      // Add your code for entering a short trade here
+   }
+
+   // Check for exiting trades
+   double averageTrueRange = iATR(NULL, 0, MA_Period, 0);
+   if(averageTrueRange > ATR_Multiplier * atrValue)
+   {
+      // Exit all positions
+      Print('Exiting All Positions: ', averageTrueRange);
+      // Add your code for exiting all positions here
+   }
+}
